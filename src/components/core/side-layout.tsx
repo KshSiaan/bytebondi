@@ -1,0 +1,53 @@
+"use client";
+import React from "react";
+import { Button } from "../ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  FileStarIcon,
+  Folder01Icon,
+  FolderUploadIcon,
+  Home04Icon,
+  ShareKnowledgeIcon,
+} from "@hugeicons/core-free-icons";
+
+const navs = [
+  {
+    name: "Upload Files",
+    icon: FolderUploadIcon,
+    url: "/upload",
+  },
+  {
+    name: "My Files",
+    icon: Folder01Icon,
+    url: "/files",
+  },
+  {
+    name: "Starred Files",
+    icon: FileStarIcon,
+    url: "/starred",
+  },
+  {
+    name: "Shared Files",
+    icon: ShareKnowledgeIcon,
+    url: "/shared",
+  },
+];
+
+export default function SideLayout() {
+  return (
+    <div className=" h-full w-full  p-6">
+      <section className="h-full w-full space-y-2">
+        {navs.map((nav) => (
+          <Button
+            variant="ghost"
+            className="w-full justify-start!"
+            size="lg"
+            key={nav.name}
+          >
+            <HugeiconsIcon icon={nav.icon} /> {nav.name}
+          </Button>
+        ))}
+      </section>
+    </div>
+  );
+}
