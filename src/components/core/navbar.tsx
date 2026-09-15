@@ -18,9 +18,9 @@ export default function Navbar() {
           height={64}
           width={64}
           alt="ByteBondi"
-          className="size-10"
+          className="size-8"
         />
-        <span className="text-xl font-bold text-secondary">ByteBondi</span>
+        <span className="text-sm font-bold text-secondary -mb-1">Title</span>
       </div>
       {data?.session?.token ? (
         <Avatar>
