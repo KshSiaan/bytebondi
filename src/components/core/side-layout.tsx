@@ -9,13 +9,9 @@ import {
   Home04Icon,
   ShareKnowledgeIcon,
 } from "@hugeicons/core-free-icons";
+import Link from "next/link";
 
 const navs = [
-  {
-    name: "Upload Files",
-    icon: FolderUploadIcon,
-    url: "/upload",
-  },
   {
     name: "My Files",
     icon: Folder01Icon,
@@ -35,7 +31,7 @@ const navs = [
 
 export default function SideLayout() {
   return (
-    <div className=" h-full w-full  p-6">
+    <div className=" h-full w-full p-6">
       <section className="h-full w-full space-y-2">
         {navs.map((nav) => (
           <Button
@@ -43,8 +39,11 @@ export default function SideLayout() {
             className="w-full justify-start!"
             size="lg"
             key={nav.name}
+            asChild
           >
-            <HugeiconsIcon icon={nav.icon} /> {nav.name}
+            <Link href={nav.url}>
+              <HugeiconsIcon icon={nav.icon} /> {nav.name}
+            </Link>
           </Button>
         ))}
       </section>

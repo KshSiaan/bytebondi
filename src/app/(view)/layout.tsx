@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Suspense>
         </aside>
         <div className="flex-1 min-w-0 pr-6 pb-6">
-          <main className="h-full bg-muted rounded-xl p-6">{children}</main>
+          <main className="h-full bg-muted rounded-xl p-2">{children}</main>
         </div>
       </div>
     </div>
