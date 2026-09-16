@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   AppleMusicIcon,
   CheckIcon,
+  ClapperboardIcon,
   File02Icon,
   FileZipIcon,
   Image02Icon,
@@ -17,6 +18,7 @@ import { FileValidator } from "./file-validator";
 import { cn } from "cn";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type UploadStatus = "pending" | "uploading" | "completed" | "error";
 
@@ -56,7 +58,6 @@ export default function Uploader({
 
     setIsUploading(true);
 
-    // Mark every file as uploading.
     setUploadStatuses(
       Object.fromEntries(
         files.map((file) => [
@@ -92,6 +93,8 @@ export default function Uploader({
       const decoder = new TextDecoder();
 
       let buffer = "";
+      let completedCount = 0;
+      let errorCount = 0;
 
       while (true) {
         const { value, done } = await reader.read();
@@ -104,7 +107,6 @@ export default function Uploader({
 
         const lines = buffer.split("\n");
 
-        // Keep the incomplete line for the next chunk.
         buffer = lines.pop() ?? "";
 
         for (const line of lines) {
@@ -122,6 +124,8 @@ export default function Uploader({
 
               if (!file) continue;
 
+              completedCount++;
+
               updateFileStatus(getFileKey(file), "completed");
             }
 
@@ -130,6 +134,15 @@ export default function Uploader({
                 (file) =>
                   getFileKey(file) === event.fileKey ||
                   file.name === event.fileName,
+              );
+
+              errorCount++;
+
+              toast.error(
+                `Failed to upload ${file?.name ?? "a file"}: ${event.message}`,
+                {
+                  description: "Please try again.",
+                },
               );
 
               if (!file) continue;
@@ -142,7 +155,7 @@ export default function Uploader({
         }
       }
 
-      // Flush any remaining decoder data.
+      // Process the final buffered event
       buffer += decoder.decode();
 
       if (buffer.trim()) {
@@ -157,17 +170,33 @@ export default function Uploader({
             );
 
             if (file) {
+              completedCount++;
+
               updateFileStatus(getFileKey(file), "completed");
             }
+          }
+
+          if (event.type === "error") {
+            errorCount++;
           }
         } catch (error) {
           console.error("Failed to parse final upload event:", error);
         }
       }
+
+      // ✅ The entire stream is finished here
+      if (completedCount === files.length) {
+        toast.success(
+          `${files.length - errorCount} files uploaded successfully!`,
+        );
+        setTimeout(() => {
+          setFiles([]);
+          setUploadStatuses({});
+        }, 1000);
+      }
     } catch (error) {
       console.error("Error uploading files:", error);
 
-      // Mark unfinished files as failed.
       setUploadStatuses((prev) => {
         const next = { ...prev };
 
@@ -183,6 +212,8 @@ export default function Uploader({
 
         return next;
       });
+
+      toast.error("Upload failed.");
     } finally {
       setIsUploading(false);
     }
@@ -362,6 +393,8 @@ export default function Uploader({
                             <HugeiconsIcon icon={Image02Icon} />
                           ) : validatedFile.type === "audio" ? (
                             <HugeiconsIcon icon={AppleMusicIcon} />
+                          ) : validatedFile.type === "video" ? (
+                            <HugeiconsIcon icon={ClapperboardIcon} />
                           ) : validatedFile.type === "zip" ? (
                             <HugeiconsIcon icon={FileZipIcon} />
                           ) : (

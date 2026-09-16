@@ -3,8 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import React from "react";
+import React, { Suspense } from "react";
 import Uploader from "./uploader";
+import Files from "./files";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Page() {
   const [isDragging, setIsDragging] = React.useState(false);
@@ -63,7 +65,15 @@ export default function Page() {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <div className=""></div>
+      <Suspense
+        fallback={
+          <div className="h-full w-full flex items-center justify-center">
+            <Spinner />
+          </div>
+        }
+      >
+        <Files />
+      </Suspense>
       <Uploader files={files} setFiles={setFiles} isDragging={isDragging} />
     </div>
   );

@@ -1,6 +1,22 @@
 import { createSupabaseStorageClient } from "@/lib/storage/supabase";
+//! import your db instance and file schema here
+import { db } from "@/lib/db";
+import { files as FILES } from "@/db/schema";
+import { getServerSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
+  const session = await getServerSession(req.headers);
+
+  if (!session) {
+    return Response.json(
+      {
+        message: "Unauthorized",
+      },
+      {
+        status: 401,
+      },
+    );
+  }
   try {
     const formData = await req.formData();
 
@@ -26,6 +42,17 @@ export async function POST(req: Request) {
         const send = (data: object) => {
           controller.enqueue(encoder.encode(`${JSON.stringify(data)}\n`));
         };
+
+        //! Keep track of only successfully uploaded files.
+        //! These will be inserted into the database after every upload is finished.
+        const successfulFiles: {
+          fileKey: string;
+          fileName: string;
+          path: string;
+          size: number;
+          type: string;
+          lastModified: number;
+        }[] = [];
 
         try {
           const supabase = createSupabaseStorageClient();
@@ -66,11 +93,24 @@ export async function POST(req: Request) {
                 continue;
               }
 
+              const {
+                data: { publicUrl },
+              } = supabase.storage.from("file").getPublicUrl(data.path);
+
+              successfulFiles.push({
+                fileKey,
+                fileName: file.name,
+                path: publicUrl,
+                size: file.size,
+                type: file.type || "application/octet-stream",
+                lastModified: file.lastModified,
+              });
+
               send({
                 type: "complete",
                 fileKey,
                 fileName: file.name,
-                path: data.path,
+                path: publicUrl,
               });
             } catch (error) {
               send({
@@ -85,8 +125,24 @@ export async function POST(req: Request) {
             }
           }
 
+          if (successfulFiles.length) {
+            for (const file of successfulFiles) {
+              await db.insert(FILES).values({
+                id: crypto.randomUUID(),
+                fileName: file.fileName,
+                fileUrl: file.path,
+                type: file.type,
+                size: file.size.toString(),
+                userId: session.user.id,
+              });
+            }
+          }
+
           send({
             type: "done",
+            files: successfulFiles,
+            uploadedCount: successfulFiles.length,
+            failedCount: files.length - successfulFiles.length,
           });
 
           controller.close();
