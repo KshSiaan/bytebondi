@@ -102,7 +102,7 @@ export default function Files() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
               {file?.type.startsWith("image/") ? (
                 <Image
-                  src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=800&q=80"
+                  src={file?.fileUrl}
                   alt={file?.fileName}
                   height={200}
                   width={400}
@@ -137,15 +137,29 @@ export default function Files() {
                 title="mountain-landscape-final.png"
                 className="truncate text-xs font-medium leading-4 text-foreground"
               >
-                mountain-landscape-final.png
+                {file?.fileName}
               </p>
 
               <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <span>2.4 MB</span>
+                <span>
+                  {file?.size
+                    ? (parseInt(file.size) / (1024 * 1024)).toFixed(1)
+                    : "0.0"}
+                  MB
+                </span>
 
                 <span className="size-0.5 shrink-0 rounded-full bg-muted-foreground/50" />
 
-                <span className="truncate">Uploaded Sep 16, 2026</span>
+                <span className="truncate">
+                  Uploaded{" "}
+                  {file?.updatedAt
+                    ? new Date(file.updatedAt).toLocaleDateString("en-GB", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "Unknown"}
+                </span>
               </div>
             </div>
           </div>
