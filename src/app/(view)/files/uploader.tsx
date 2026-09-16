@@ -19,6 +19,7 @@ import { cn } from "cn";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 
 type UploadStatus = "pending" | "uploading" | "completed" | "error";
 
@@ -38,6 +39,7 @@ export default function Uploader({
   const [uploadStatuses, setUploadStatuses] = useState<
     Record<string, FileStatus>
   >({});
+  const { mutate } = useSWRConfig();
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -193,6 +195,7 @@ export default function Uploader({
           setFiles([]);
           setUploadStatuses({});
         }, 1000);
+        mutate("/api/files");
       }
     } catch (error) {
       console.error("Error uploading files:", error);
