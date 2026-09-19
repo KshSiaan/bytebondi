@@ -10,6 +10,7 @@ export const files = pgTable(
     fileName: text("file_name").notNull(),
     size: text("size").notNull(),
     type: text("type").notNull(),
+    star: text("star").default("false").notNull(),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

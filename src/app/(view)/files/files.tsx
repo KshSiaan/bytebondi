@@ -1,26 +1,15 @@
 import { ImageZoom } from "@/components/kibo-ui/image-zoom";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import {
   AppleMusicIcon,
   ClapperboardIcon,
   Database01Icon,
-  Delete02Icon,
-  Download01Icon,
   File02Icon,
   FileZipIcon,
   GridTableIcon,
   Image03Icon,
-  MoreVerticalCircle01Icon,
-  Share07Icon,
-  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
@@ -29,13 +18,15 @@ import useSWR from "swr";
 import Downloader from "./downloader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { play } from "cuelume";
+import Controller from "./controller";
+import Grid from "./grid";
+import ListView from "./list-view";
 
 export default function Files() {
   const [selectedType, setSelectedType] = React.useState<
-    "images" | "videos" | "audios" | "others" | undefined
-  >();
+    Array<"image" | "video" | "audio" | "others" | undefined>
+  >([]);
   const [loading, setLoading] = React.useState<string | null>(null);
-  const isMobile = useIsMobile();
   const [isGridView, setIsGridView] = React.useState(true);
   type FilesResponse = {
     message: string;
@@ -44,6 +35,7 @@ export default function Files() {
       fileUrl: string;
       fileName: string;
       size: string;
+      star: boolean;
       type: string;
       userId: string;
       createdAt: string;
@@ -55,30 +47,6 @@ export default function Files() {
     "/api/files",
     (url: string) => fetch(url).then((res) => res.json()),
   );
-
-  const handleDeleteFile = async (fileId: string) => {
-    setLoading(fileId);
-    try {
-      const response = await fetch(`/api/files/${fileId}`, {
-        method: "DELETE",
-      });
-      const result = await response.json();
-      if (response.ok) {
-        // Optionally, you can refetch the files or update the state to remove the deleted file from the UI
-        await mutate();
-        console.log(result.message);
-        play("bloom");
-      } else {
-        console.error(result.message);
-        play("error");
-      }
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      play("error");
-    } finally {
-      setLoading(null);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -97,21 +65,92 @@ export default function Files() {
       </pre>
     );
   }
+
+  const filteredFiles = data?.data.filter((file) => {
+    if (selectedType.length === 0) return true;
+    if (selectedType.includes("image") && file.type.startsWith("image/")) {
+      return true;
+    }
+    if (selectedType.includes("video") && file.type.startsWith("video/")) {
+      return true;
+    }
+    if (selectedType.includes("audio") && file.type.startsWith("audio/")) {
+      return true;
+    }
+    if (
+      selectedType.includes("others") &&
+      !file.type.startsWith("image/") &&
+      !file.type.startsWith("video/") &&
+      !file.type.startsWith("audio/")
+    ) {
+      return true;
+    }
+    return false;
+  });
+
   return (
     <section className="h-full w-full flex flex-col gap-2">
       <section className="w-full p-2 rounded-xl border bg-foreground/5 flex justify-between items-center">
         <div className="text-xs font-semibold text-foreground flex items-center gap-2">
-          <Button size={isMobile ? "icon" : "xs"} variant="ghost">
-            {isMobile ? <HugeiconsIcon icon={Image03Icon} /> : "3 Images"}
+          <Button
+            size={"icon"}
+            variant={selectedType.includes("image") ? "link" : "ghost"}
+            onClick={() => {
+              if (selectedType.includes("image")) {
+                setSelectedType(
+                  selectedType.filter((type) => type !== "image"),
+                );
+              } else {
+                setSelectedType([...selectedType, "image"]);
+              }
+            }}
+          >
+            <HugeiconsIcon icon={Image03Icon} />
           </Button>
-          <Button size={isMobile ? "icon" : "xs"} variant="ghost">
-            {isMobile ? <HugeiconsIcon icon={ClapperboardIcon} /> : "3 Videos"}
+          <Button
+            size={"icon"}
+            variant={selectedType.includes("video") ? "link" : "ghost"}
+            onClick={() => {
+              if (selectedType.includes("video")) {
+                setSelectedType(
+                  selectedType.filter((type) => type !== "video"),
+                );
+              } else {
+                setSelectedType([...selectedType, "video"]);
+              }
+            }}
+          >
+            <HugeiconsIcon icon={ClapperboardIcon} />
           </Button>
-          <Button size={isMobile ? "icon" : "xs"} variant="ghost">
-            {isMobile ? <HugeiconsIcon icon={AppleMusicIcon} /> : "3 Audios"}
+          <Button
+            size={"icon"}
+            variant={selectedType.includes("audio") ? "link" : "ghost"}
+            onClick={() => {
+              if (selectedType.includes("audio")) {
+                setSelectedType(
+                  selectedType.filter((type) => type !== "audio"),
+                );
+              } else {
+                setSelectedType([...selectedType, "audio"]);
+              }
+            }}
+          >
+            <HugeiconsIcon icon={AppleMusicIcon} />
           </Button>
-          <Button size={isMobile ? "icon" : "xs"} variant="ghost">
-            {isMobile ? <HugeiconsIcon icon={File02Icon} /> : "3 Others"}
+          <Button
+            size={"icon"}
+            variant={selectedType.includes("others") ? "link" : "ghost"}
+            onClick={() => {
+              if (selectedType.includes("others")) {
+                setSelectedType(
+                  selectedType.filter((type) => type !== "others"),
+                );
+              } else {
+                setSelectedType([...selectedType, "others"]);
+              }
+            }}
+          >
+            <HugeiconsIcon icon={File02Icon} />
           </Button>
         </div>
         <div className="space-x-2">
@@ -131,168 +170,21 @@ export default function Files() {
           </Button>
         </div>
       </section>
-      <section
-        className={cn(
-          "flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 md:p-2 overflow-y-auto",
-        )}
-      >
-        {data?.data.map((file) => (
-          <div
-            key={file?.id}
-            className="group w-full h-min overflow-hidden rounded-xl border bg-card p-1.5 transition-all hover:border-foreground/20 hover:shadow-sm"
-          >
-            {/* Preview */}
-            {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
-              {file?.type.startsWith("image/") ? (
-                <ImageZoom>
-                  <Image
-                    src={file?.fileUrl}
-                    alt={file?.fileName}
-                    height={200}
-                    width={400}
-                    unoptimized
-                    className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  />
-                </ImageZoom>
-              ) : (
-                <div className="size-full flex justify-center items-center">
-                  {file?.type.startsWith("image/") ? (
-                    <HugeiconsIcon
-                      icon={Image03Icon}
-                      className="size-8 text-foreground/30"
-                    />
-                  ) : file?.type.startsWith("audio/") ? (
-                    <HugeiconsIcon
-                      icon={AppleMusicIcon}
-                      className="size-8 text-foreground/30"
-                    />
-                  ) : file?.type.startsWith("video/") ? (
-                    <HugeiconsIcon
-                      icon={ClapperboardIcon}
-                      className="size-8 text-foreground/30"
-                    />
-                  ) : file?.type.startsWith("application/zip") ? (
-                    <HugeiconsIcon
-                      icon={FileZipIcon}
-                      className="size-8 text-foreground/30"
-                    />
-                  ) : (
-                    <HugeiconsIcon
-                      icon={File02Icon}
-                      className="size-8 text-foreground/30"
-                    />
-                  )}
-                </div>
-              )}
-
-              {/* File type */}
-              {!isMobile && (
-                <div className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md border border-white/10 bg-black/50 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-md">
-                  {file?.type.startsWith("image/") ? (
-                    <HugeiconsIcon icon={Image03Icon} className="size-3" />
-                  ) : file?.type.startsWith("audio/") ? (
-                    <HugeiconsIcon icon={AppleMusicIcon} className="size-3" />
-                  ) : file?.type.startsWith("video/") ? (
-                    <HugeiconsIcon icon={ClapperboardIcon} className="size-3" />
-                  ) : file?.type.startsWith("application/zip") ? (
-                    <HugeiconsIcon icon={FileZipIcon} className="size-3" />
-                  ) : (
-                    <HugeiconsIcon icon={File02Icon} className="size-3" />
-                  )}
-                  <span>{file?.type.split("/")[0]}</span>
-                </div>
-              )}
-
-              {/* More */}
-              <div className="">
-                <Downloader url={file?.fileUrl} fileName={file?.fileName} />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      size="icon-sm"
-                      variant="secondary"
-                      onPointerDown={(e) => {
-                        e.stopPropagation();
-                        play("toggle");
-                      }}
-                      className="absolute right-2 top-2 size-7 rounded-md border-0 bg-black/50 text-white"
-                    >
-                      <HugeiconsIcon
-                        icon={MoreVerticalCircle01Icon}
-                        className="size-3.5"
-                      />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem className="text-xs">
-                      <HugeiconsIcon icon={Share07Icon} className="size-3" />
-                      Share File
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-xs text-amber-600">
-                      <HugeiconsIcon icon={StarIcon} className="size-3" />
-                      Star File
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      variant="destructive"
-                      className="text-xs"
-                      onClick={() => {
-                        play("loading");
-                        handleDeleteFile(file?.id);
-                      }}
-                      disabled={loading === file?.id}
-                    >
-                      {loading === file?.id ? (
-                        <Spinner className="size-3" />
-                      ) : (
-                        <>
-                          <HugeiconsIcon
-                            icon={Delete02Icon}
-                            className="size-3"
-                          />
-                          Delete
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-
-            {/* Information */}
-            <div className="px-1.5 pb-1 pt-2.5">
-              <p
-                title="mountain-landscape-final.png"
-                className="truncate text-xs font-medium leading-4 text-foreground"
-              >
-                {file?.fileName}
-              </p>
-
-              <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <span>
-                  {file?.size
-                    ? (parseInt(file.size) / (1024 * 1024)).toFixed(1)
-                    : "0.0"}
-                  MB
-                </span>
-
-                <span className="size-0.5 shrink-0 rounded-full bg-muted-foreground/50" />
-
-                <span className="truncate">
-                  Uploaded{" "}
-                  {file?.updatedAt
-                    ? new Date(file.updatedAt).toLocaleDateString("en-GB", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                    : "Unknown"}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </section>
+      {isGridView ? (
+        <Grid
+          files={filteredFiles}
+          mutate={mutate}
+          loading={loading}
+          setLoading={setLoading}
+        />
+      ) : (
+        <ListView
+          files={filteredFiles}
+          mutate={mutate}
+          loading={loading}
+          setLoading={setLoading}
+        />
+      )}
     </section>
   );
 }

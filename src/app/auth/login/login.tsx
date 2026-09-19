@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/input-group";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import useSWR from "swr";
 
 const formSchema = z.object({
   email: z.email("Please enter a valid email address."),
@@ -40,14 +41,38 @@ export default function Login() {
       password: "",
     },
   });
-
   const email = form.watch("email");
   const password = form.watch("password");
+
+  const isValidEmail = z.email().safeParse(email).success;
+  const isValidPassword = z.string().min(6).safeParse(password).success;
+
+  const { data: emailExists } = useSWR(
+    isValidEmail ? `/api/checkMail?email=${email}` : null,
+    async (url) => {
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Failed to fetch");
+      }
+      return res.json();
+    },
+  );
 
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
 
     try {
+      if (emailExists?.exists) {
+        const { error } = await authClient.signIn.email({
+          email: data.email,
+          password: data.password,
+          callbackURL: new URL("/files", window.location.origin).toString(),
+        });
+        if (error) {
+          toast.error(error.message || "An error occurred during sign-in.");
+          return;
+        }
+      }
       const { error } = await authClient.signUp.email({
         name: data.email.split("@")[0],
         email: data.email,
@@ -68,9 +93,6 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-
-  const isValidEmail = z.email().safeParse(email).success;
-  const isValidPassword = z.string().min(6).safeParse(password).success;
 
   const showPasswordField = isValidEmail;
   const showButton = isValidEmail && isValidPassword;
@@ -127,13 +149,23 @@ export default function Login() {
         </Field>
 
         {/* Submit */}
-        <Button
-          type="submit"
-          className={cn("mx-auto w-min px-6", !showButton && "hidden")}
-          disabled={isLoading}
-        >
-          {isLoading ? "Signing Up..." : "Sign Up"}
-        </Button>
+        {emailExists?.exists ? (
+          <Button
+            type="submit"
+            className={cn("mx-auto w-min px-6", !showButton && "hidden")}
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            className={cn("mx-auto w-min px-6", !showButton && "hidden")}
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing Up..." : "Sign Up"}
+          </Button>
+        )}
       </FieldGroup>
     </form>
   );

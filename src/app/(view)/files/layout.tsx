@@ -8,7 +8,7 @@ import {
   ShareKnowledgeIcon,
 } from "@hugeicons/core-free-icons";
 
-const navs = [
+export const navs = [
   {
     name: "My Files",
     icon: Folder01Icon,

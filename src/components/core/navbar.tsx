@@ -15,6 +15,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
+import Profile from "./profile";
 
 export default function Navbar({
   navs,
@@ -71,10 +72,7 @@ export default function Navbar({
         )}
       </div>
       {data?.session?.token ? (
-        <Avatar>
-          <AvatarImage src="https://api.dicebear.com/10.x/critters/svg?tags=animation&seed=we2flpo2" />
-          <AvatarFallback>UI</AvatarFallback>
-        </Avatar>
+        <Profile user={data} />
       ) : (
         <Button className="text-xs!" data-cuelume-hover asChild>
           <Link href="/auth/login">

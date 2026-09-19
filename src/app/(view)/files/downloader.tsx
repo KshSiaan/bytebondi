@@ -7,16 +7,24 @@ import React from "react";
 export default function Downloader({
   url,
   fileName,
+  absolute = true,
+  ghost = false,
 }: {
   url: string;
   fileName: string;
+  absolute?: boolean;
+  ghost?: boolean;
 }) {
   const [preparing, setPreparing] = React.useState(false);
   return (
     <Button
       size="icon-sm"
-      variant="secondary"
-      className="absolute right-11 top-2 size-7 rounded-md border-0 bg-black/50 text-white"
+      variant={ghost ? "ghost" : "secondary"}
+      className={
+        absolute
+          ? "absolute right-11 top-2 size-7 rounded-md border-0 bg-black/50 text-white"
+          : "size-7 rounded-md border-0"
+      }
       onClick={async () => {
         setPreparing(true);
         try {
