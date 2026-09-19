@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 
 import Link from "next/link";
+import { play } from "cuelume";
 
 export default function SideLayout({
   navs,
@@ -22,6 +23,9 @@ export default function SideLayout({
             variant="ghost"
             className="w-full justify-start!"
             size="lg"
+            onClick={() => {
+              play("page");
+            }}
             key={nav.name}
             asChild
           >

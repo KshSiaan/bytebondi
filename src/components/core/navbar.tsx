@@ -76,7 +76,7 @@ export default function Navbar({
           <AvatarFallback>UI</AvatarFallback>
         </Avatar>
       ) : (
-        <Button className="text-xs!" asChild>
+        <Button className="text-xs!" data-cuelume-hover asChild>
           <Link href="/auth/login">
             Sign In
             <HugeiconsIcon icon={LogIn} />

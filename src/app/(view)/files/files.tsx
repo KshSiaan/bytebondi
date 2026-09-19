@@ -28,11 +28,13 @@ import React from "react";
 import useSWR from "swr";
 import Downloader from "./downloader";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { play } from "cuelume";
 
 export default function Files() {
   const [selectedType, setSelectedType] = React.useState<
     "images" | "videos" | "audios" | "others" | undefined
   >();
+  const [loading, setLoading] = React.useState<string | null>(null);
   const isMobile = useIsMobile();
   const [isGridView, setIsGridView] = React.useState(true);
   type FilesResponse = {
@@ -49,10 +51,34 @@ export default function Files() {
     }>;
   };
 
-  const { data, error, isLoading } = useSWR<FilesResponse>(
+  const { data, error, isLoading, mutate } = useSWR<FilesResponse>(
     "/api/files",
     (url: string) => fetch(url).then((res) => res.json()),
   );
+
+  const handleDeleteFile = async (fileId: string) => {
+    setLoading(fileId);
+    try {
+      const response = await fetch(`/api/files/${fileId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        // Optionally, you can refetch the files or update the state to remove the deleted file from the UI
+        await mutate();
+        console.log(result.message);
+        play("bloom");
+      } else {
+        console.error(result.message);
+        play("error");
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      play("error");
+    } finally {
+      setLoading(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -116,6 +142,7 @@ export default function Files() {
             className="group w-full h-min overflow-hidden rounded-xl border bg-card p-1.5 transition-all hover:border-foreground/20 hover:shadow-sm"
           >
             {/* Preview */}
+            {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
             <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
               {file?.type.startsWith("image/") ? (
                 <ImageZoom>
@@ -185,7 +212,11 @@ export default function Files() {
                     <Button
                       size="icon-sm"
                       variant="secondary"
-                      className="absolute right-2 top-2 size-7 rounded-md border-0 bg-black/50 text-white "
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        play("toggle");
+                      }}
+                      className="absolute right-2 top-2 size-7 rounded-md border-0 bg-black/50 text-white"
                     >
                       <HugeiconsIcon
                         icon={MoreVerticalCircle01Icon}
@@ -202,9 +233,26 @@ export default function Files() {
                       <HugeiconsIcon icon={StarIcon} className="size-3" />
                       Star File
                     </DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive" className="text-xs">
-                      <HugeiconsIcon icon={Delete02Icon} className="size-3" />
-                      Delete
+                    <DropdownMenuItem
+                      variant="destructive"
+                      className="text-xs"
+                      onClick={() => {
+                        play("loading");
+                        handleDeleteFile(file?.id);
+                      }}
+                      disabled={loading === file?.id}
+                    >
+                      {loading === file?.id ? (
+                        <Spinner className="size-3" />
+                      ) : (
+                        <>
+                          <HugeiconsIcon
+                            icon={Delete02Icon}
+                            className="size-3"
+                          />
+                          Delete
+                        </>
+                      )}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
