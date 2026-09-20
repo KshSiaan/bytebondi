@@ -7,6 +7,9 @@ import {
   Folder01Icon,
   ShareKnowledgeIcon,
 } from "@hugeicons/core-free-icons";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const navs = [
   {
@@ -26,7 +29,20 @@ export const navs = [
   // },
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+
+  if (!session) {
+    return redirect("/auth/login");
+  }
+
   return (
     <div className="h-dvh w-full flex flex-col">
       <Navbar navs={navs} />
