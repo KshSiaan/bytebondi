@@ -5,6 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 
 import Link from "next/link";
 import { play } from "cuelume";
+import { usePathname } from "next/navigation";
 
 export default function SideLayout({
   navs,
@@ -15,12 +16,14 @@ export default function SideLayout({
     url: string;
   }[];
 }) {
+  const path = usePathname();
+
   return (
     <div className=" h-full w-full p-6">
       <section className="h-full w-full space-y-2">
         {navs.map((nav) => (
           <Button
-            variant="ghost"
+            variant={path === nav.url ? "outline" : "ghost"}
             className="w-full justify-start!"
             size="lg"
             onClick={() => {

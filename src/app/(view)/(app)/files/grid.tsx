@@ -2,17 +2,27 @@ import { ImageZoom } from "@/components/kibo-ui/image-zoom";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { cn } from "cn";
 import Image from "next/image";
-import React from "react";
+import React, { Suspense } from "react";
 import {
   AppleMusicIcon,
   ClapperboardIcon,
   File02Icon,
   FileZipIcon,
   Image03Icon,
+  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Downloader from "./downloader";
 import Controller from "./controller";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import Viewer from "./viewer";
+import { Spinner } from "@/components/ui/spinner";
 export default function Grid({
   files,
   mutate,
@@ -62,6 +72,56 @@ export default function Grid({
                   className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
               </ImageZoom>
+            ) : file?.type.startsWith("audio/") ||
+              file?.type.startsWith("video/") ? (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="size-full flex justify-center items-center">
+                    {file?.type.startsWith("image/") ? (
+                      <HugeiconsIcon
+                        icon={Image03Icon}
+                        className="size-8 text-foreground/30"
+                      />
+                    ) : file?.type.startsWith("audio/") ? (
+                      <HugeiconsIcon
+                        icon={AppleMusicIcon}
+                        className="size-8 text-foreground/30"
+                      />
+                    ) : file?.type.startsWith("video/") ? (
+                      <HugeiconsIcon
+                        icon={ClapperboardIcon}
+                        className="size-8 text-foreground/30"
+                      />
+                    ) : file?.type.startsWith("application/zip") ? (
+                      <HugeiconsIcon
+                        icon={FileZipIcon}
+                        className="size-8 text-foreground/30"
+                      />
+                    ) : (
+                      <HugeiconsIcon
+                        icon={File02Icon}
+                        className="size-8 text-foreground/30"
+                      />
+                    )}
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="min-w-[96dvw] flex flex-col">
+                  <DialogHeader>
+                    <DialogTitle className="text-sm text-muted-foreground">
+                      {file?.fileName}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <Suspense
+                    fallback={
+                      <div className="flex justify-center items-center h-full">
+                        <Spinner />
+                      </div>
+                    }
+                  >
+                    <Viewer file={file} />
+                  </Suspense>
+                </DialogContent>
+              </Dialog>
             ) : (
               <div className="size-full flex justify-center items-center">
                 {file?.type.startsWith("image/") ? (
@@ -121,6 +181,14 @@ export default function Grid({
                 file={file}
               />
             </div>
+
+            {file?.star && (
+              <HugeiconsIcon
+                icon={StarIcon}
+                fill="currentColor"
+                className="size-4 absolute bottom-3 left-3 text-amber-400"
+              />
+            )}
           </div>
 
           {/* Information */}

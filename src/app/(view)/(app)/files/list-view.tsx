@@ -9,6 +9,7 @@ import {
   File02Icon,
   FileZipIcon,
   Image03Icon,
+  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Downloader from "./downloader";
@@ -120,7 +121,14 @@ export default function ListView({
             </div>
           </div>
 
-          <div className="relative pr-2 space-x-2">
+          <div className="relative pr-2 space-x-2 flex justify-around items-center">
+            {file?.star && (
+              <HugeiconsIcon
+                icon={StarIcon}
+                fill="currentColor"
+                className="size-4 text-amber-400"
+              />
+            )}
             <Downloader
               url={file?.fileUrl}
               fileName={file?.fileName}

@@ -19,11 +19,11 @@ export const navs = [
     icon: FileStarIcon,
     url: "/starred",
   },
-  {
-    name: "Shared Files",
-    icon: ShareKnowledgeIcon,
-    url: "/shared",
-  },
+  // {
+  //   name: "Shared Files",
+  //   icon: ShareKnowledgeIcon,
+  //   url: "/shared",
+  // },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {

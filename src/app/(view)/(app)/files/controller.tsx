@@ -63,6 +63,28 @@ export default function Controller({
       setLoading(null);
     }
   };
+  const handleStarFile = async (fileId: string) => {
+    setLoading(fileId);
+    try {
+      const response = await fetch(`/api/files/star/${fileId}`, {
+        method: "PATCH",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        mutate();
+        console.log(result.message);
+        play("bloom");
+      } else {
+        console.error(result.message);
+        play("error");
+      }
+    } catch (error) {
+      console.error("Error starring file:", error);
+      play("error");
+    } finally {
+      setLoading(null);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -88,9 +110,15 @@ export default function Controller({
           <HugeiconsIcon icon={Share07Icon} className="size-3" />
           Share File
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-xs text-amber-600">
+        <DropdownMenuItem
+          className="text-xs text-amber-600"
+          onClick={() => {
+            play("loading");
+            handleStarFile(file?.id);
+          }}
+        >
           <HugeiconsIcon icon={StarIcon} className="size-3" />
-          Star File
+          {file?.star ? "Unstar" : "Star"} File
         </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"

@@ -22,7 +22,7 @@ import Controller from "./controller";
 import Grid from "./grid";
 import ListView from "./list-view";
 
-export default function Files() {
+export default function Files({ starred }: { starred?: boolean }) {
   const [selectedType, setSelectedType] = React.useState<
     Array<"image" | "video" | "audio" | "others" | undefined>
   >([]);
@@ -43,8 +43,10 @@ export default function Files() {
     }>;
   };
 
+  const url = starred ? "/api/files?starred=true" : "/api/files";
+
   const { data, error, isLoading, mutate } = useSWR<FilesResponse>(
-    "/api/files",
+    url,
     (url: string) => fetch(url).then((res) => res.json()),
   );
 
@@ -96,6 +98,7 @@ export default function Files() {
             size={"icon"}
             variant={selectedType.includes("image") ? "link" : "ghost"}
             onClick={() => {
+              play("toggle");
               if (selectedType.includes("image")) {
                 setSelectedType(
                   selectedType.filter((type) => type !== "image"),
@@ -111,6 +114,7 @@ export default function Files() {
             size={"icon"}
             variant={selectedType.includes("video") ? "link" : "ghost"}
             onClick={() => {
+              play("toggle");
               if (selectedType.includes("video")) {
                 setSelectedType(
                   selectedType.filter((type) => type !== "video"),
@@ -126,6 +130,7 @@ export default function Files() {
             size={"icon"}
             variant={selectedType.includes("audio") ? "link" : "ghost"}
             onClick={() => {
+              play("toggle");
               if (selectedType.includes("audio")) {
                 setSelectedType(
                   selectedType.filter((type) => type !== "audio"),
@@ -141,6 +146,7 @@ export default function Files() {
             size={"icon"}
             variant={selectedType.includes("others") ? "link" : "ghost"}
             onClick={() => {
+              play("toggle");
               if (selectedType.includes("others")) {
                 setSelectedType(
                   selectedType.filter((type) => type !== "others"),
@@ -157,14 +163,20 @@ export default function Files() {
           <Button
             size="icon"
             variant={isGridView ? "link" : "ghost"}
-            onClick={() => setIsGridView(true)}
+            onClick={() => {
+              setIsGridView(true);
+              isGridView ? play("tick") : play("toggle");
+            }}
           >
             <HugeiconsIcon icon={GridTableIcon} />
           </Button>
           <Button
             size="icon"
             variant={isGridView ? "ghost" : "link"}
-            onClick={() => setIsGridView(false)}
+            onClick={() => {
+              setIsGridView(false);
+              !isGridView ? play("tick") : play("toggle");
+            }}
           >
             <HugeiconsIcon icon={Database01Icon} />
           </Button>

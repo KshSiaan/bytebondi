@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/_relations";
-import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index, boolean } from "drizzle-orm/pg-core";
 import { user } from "../schema";
 
 export const files = pgTable(
@@ -10,7 +10,7 @@ export const files = pgTable(
     fileName: text("file_name").notNull(),
     size: text("size").notNull(),
     type: text("type").notNull(),
-    star: text("star").default("false").notNull(),
+    star: boolean("star").notNull().default(false),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

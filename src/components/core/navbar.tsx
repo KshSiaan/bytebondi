@@ -39,7 +39,7 @@ export default function Navbar({
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>Title</DrawerTitle>
+              <DrawerTitle>RavenDrive</DrawerTitle>
             </DrawerHeader>
             <section className="h-full w-full space-y-2">
               {navs.map((nav) => (
@@ -68,7 +68,7 @@ export default function Navbar({
           className="size-8"
         />
         {!isMobile && (
-          <span className="text-sm font-bold text-secondary -mb-1">Title</span>
+          <span className="text-sm font-bold -mb-1">RavenDrive</span>
         )}
       </div>
       {data?.session?.token ? (
