@@ -1,6 +1,5 @@
 import Navbar from "@/components/core/navbar";
 import React from "react";
-import { navs } from "./files/layout";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
