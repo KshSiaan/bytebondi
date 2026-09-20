@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import ClientProvider from "@/provider/cleint-provider";
+import PwaRegister from "@/components/pwa-register";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
     "A simple, secure platform to store, manage, and share your files.",
 
   applicationName: "ByteBondi",
+
+  manifest: "/manifest.json",
 
   icons: {
     icon: [{ url: "/favicon.ico" }, { url: "/icon.png", type: "image/png" }],
@@ -66,6 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={cn("h-full", "antialiased", poppins.className, "font-sans")}
     >
       <body className="">
+        <PwaRegister />
         <ClientProvider>
           <TooltipProvider>{children}</TooltipProvider>
         </ClientProvider>
