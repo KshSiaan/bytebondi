@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import ClientProvider from "@/provider/cleint-provider";
 import PwaRegister from "@/components/pwa-register";
+import { ThemeProvider } from "@/provider/theme-provider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -67,11 +68,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={cn("h-full", "antialiased", poppins.className, "font-sans")}
+      suppressHydrationWarning
     >
       <body className="">
         <PwaRegister />
         <ClientProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TooltipProvider>{children}</TooltipProvider>
+          </ThemeProvider>
         </ClientProvider>
         <Toaster position="top-center" />
       </body>
