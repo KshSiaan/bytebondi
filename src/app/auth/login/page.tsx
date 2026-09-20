@@ -37,12 +37,12 @@ const itemVariants: Variants = {
 
 export default function Page() {
   return (
-    <main className="flex h-dvh w-dvw flex-col items-center justify-center gap-12">
+    <main className="flex h-dvh w-dvw  flex-col items-center justify-center gap-12">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="flex w-full flex-col items-center gap-12"
+        className="flex mx-auto w-full flex-col items-center gap-6 lg:gap-12"
       >
         <motion.div variants={itemVariants}>
           <Image
@@ -54,13 +54,16 @@ export default function Page() {
           />
         </motion.div>
 
-        <motion.h1 variants={itemVariants} className="text-6xl">
+        <motion.h1
+          variants={itemVariants}
+          className="text-lg md:text-2xl lg:text-6xl"
+        >
           Get started with Us
         </motion.h1>
 
         <motion.div
           variants={itemVariants}
-          className="flex w-1/2 items-center justify-between"
+          className="flex flex-col lg:flex-row mx-auto w-full lg:w-1/2 items-center justify-between gap-4"
         >
           <Button variant="outline">
             <HugeiconsIcon icon={GoogleIcon} />
@@ -75,7 +78,7 @@ export default function Page() {
 
         <motion.div
           variants={itemVariants}
-          className="flex w-1/3 items-center justify-center gap-4 text-sm"
+          className="flex w-full lg:w-1/3 items-center justify-center gap-4 text-sm"
         >
           <div className="h-0.5 flex-1 bg-muted" />
 
@@ -84,7 +87,7 @@ export default function Page() {
           <div className="h-0.5 flex-1 bg-muted" />
         </motion.div>
 
-        <motion.div variants={itemVariants} className="w-1/3">
+        <motion.div variants={itemVariants} className="w-5/6 lg:w-1/3">
           <Login />
         </motion.div>
       </motion.div>
