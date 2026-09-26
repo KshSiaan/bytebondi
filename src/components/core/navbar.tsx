@@ -10,6 +10,7 @@ import { authClient } from "@/lib/auth-client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
@@ -57,9 +58,11 @@ export default function Navbar({
                 size="lg"
                 asChild
               >
-                <Link href={"/new"}>
-                  <HugeiconsIcon icon={PlusIcon} /> Add File
-                </Link>
+                <DrawerClose asChild>
+                  <Link href={"/new"}>
+                    <HugeiconsIcon icon={PlusIcon} /> Add File
+                  </Link>
+                </DrawerClose>
               </Button>
               {navs.map((nav) => (
                 <Button
@@ -69,9 +72,11 @@ export default function Navbar({
                   key={nav.name}
                   asChild
                 >
-                  <Link href={nav.url}>
-                    <HugeiconsIcon icon={nav.icon} /> {nav.name}
-                  </Link>
+                  <DrawerClose asChild>
+                    <Link href={nav.url}>
+                      <HugeiconsIcon icon={nav.icon} /> {nav.name}
+                    </Link>
+                  </DrawerClose>
                 </Button>
               ))}
             </section>

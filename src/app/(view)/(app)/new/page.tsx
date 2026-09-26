@@ -17,7 +17,6 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { FileValidator } from "../files/file-validator";
 import { cn } from "cn";
-import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
