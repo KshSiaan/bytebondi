@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { play } from "cuelume";
 import { usePathname } from "next/navigation";
+import { PlusIcon } from "@hugeicons/core-free-icons";
 
 export default function SideLayout({
   navs,

@@ -94,7 +94,9 @@ export default function ListView({
                 title="mountain-landscape-final.png"
                 className="truncate text-xs font-medium leading-4 text-foreground"
               >
-                {file?.fileName}
+                {file?.fileName.length > 20
+                  ? file?.fileName.slice(0, 20) + "..."
+                  : file?.fileName}
               </p>
 
               <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-muted-foreground">

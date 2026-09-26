@@ -24,11 +24,7 @@ export default function Viewer({
       {file.type.startsWith("video/") ? (
         <Suspense fallback={<Spinner />}>
           <div className="w-full h-[80dvh]">
-            <MyPlayer
-              src={
-                "https://weuxiygfazgebqzqeiqi.supabase.co/storage/v1/object/public/file/311be428-147b-4476-aa3c-9521aa607e3b.mp4"
-              }
-            />
+            <MyPlayer src={file?.fileUrl} />
           </div>
         </Suspense>
       ) : (

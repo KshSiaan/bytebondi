@@ -50,7 +50,7 @@ export default function Grid({
   return (
     <section
       className={cn(
-        "flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2 md:p-2 overflow-y-auto",
+        "lg:flex-1 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 items-start gap-2 md:p-2 overflow-y-auto",
       )}
     >
       {files?.map((file) => (

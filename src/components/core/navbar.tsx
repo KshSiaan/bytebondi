@@ -3,7 +3,7 @@ import Image from "next/image";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
-import { LogIn, Menu02Icon } from "@hugeicons/core-free-icons";
+import { LogIn, Menu02Icon, PlusIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -38,7 +38,7 @@ export default function Navbar({
   const isMobile = useIsMobile();
   const { setTheme } = useTheme();
   return (
-    <nav className="h-14 w-full flex justify-between items-center px-6">
+    <nav className="h-14 w-full flex justify-between items-center px-2 md:px-6">
       {isMobile && (
         <Drawer direction="left">
           <DrawerTrigger asChild>
@@ -51,6 +51,16 @@ export default function Navbar({
               <DrawerTitle>RavenDrive</DrawerTitle>
             </DrawerHeader>
             <section className="h-full w-full space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full justify-start!"
+                size="lg"
+                asChild
+              >
+                <Link href={"/new"}>
+                  <HugeiconsIcon icon={PlusIcon} /> Add File
+                </Link>
+              </Button>
               {navs.map((nav) => (
                 <Button
                   variant="ghost"
@@ -74,7 +84,7 @@ export default function Navbar({
           height={64}
           width={64}
           alt="ByteBondi"
-          className="size-8"
+          className="size-8 absolute lg:relative"
         />
         {!isMobile && (
           <span className="text-sm font-bold -mb-1">RavenDrive</span>
